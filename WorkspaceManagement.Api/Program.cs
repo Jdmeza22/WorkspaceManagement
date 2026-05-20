@@ -5,6 +5,7 @@ using WorkspaceManagement.Application.Interfaces;
 using WorkspaceManagement.Application.Services;
 using WorkspaceManagement.Infrastructure.Authentication;
 using WorkspaceManagement.Infrastructure.Persistance;
+using WorkspaceManagement.Infrastructure.Repositories;
 using WorkspaceManagement.Infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,12 +14,52 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1",
+        new Microsoft.OpenApi.Models.OpenApiInfo
+        {
+            Title = "Workspace API",
+            Version = "v1"
+        });
+
+    options.AddSecurityDefinition("Bearer",
+        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+            Description = "JWT Authorization header"
+        });
+
+    options.AddSecurityRequirement(
+        new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+        {
+            {
+                new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    Reference =
+                        new Microsoft.OpenApi.Models.OpenApiReference
+                        {
+                            Type =
+                                Microsoft.OpenApi.Models.ReferenceType
+                                    .SecurityScheme,
+                            Id = "Bearer"
+                        }
+                },
+                Array.Empty<string>()
+            }
+        });
+});
 
 builder.Services.AddScoped<SqlConnectionFactory>();
 
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -40,6 +81,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     builder.Configuration["Jwt:Key"]!))
         };
     });
+
 
 builder.Services.AddAuthorization();
 
