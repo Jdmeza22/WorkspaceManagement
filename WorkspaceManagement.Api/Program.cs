@@ -109,7 +109,26 @@ builder.Services.AddAuthorization(options =>
         });
 });
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular",
+        policy =>
+        {
+            policy
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+                .WithOrigins(
+                    "http://localhost:4200");
+        });
+});
+
+
 var app = builder.Build();
+app.UseHttpsRedirection();
+app.UseCors("AllowAngular");
+
 
 app.UseSwagger();
 
@@ -118,7 +137,7 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 
 app.UseAuthorization();
-
+app.MapGet("/", () => Results.Redirect("/swagger"));
 app.MapControllers();
 
 app.Run();
