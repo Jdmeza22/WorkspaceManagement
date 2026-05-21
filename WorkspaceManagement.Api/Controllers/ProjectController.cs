@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Security.Claims;
+using WorkspaceManagement.Application.Common.Responses;
 using WorkspaceManagement.Application.Dtos.Projects;
 using WorkspaceManagement.Application.Interfaces;
+using WorkspaceManagement.Domain.Entities;
 
 namespace WorkspaceManagement.Api.Controllers;
 
@@ -17,9 +19,10 @@ public class ProjectsController( IProjectService _projectService) : ControllerBa
     {
         Guid workspaceId = GetWorkspaceId();
         List<ProjectDto> projects = await _projectService.GetByWorkspaceAsync(workspaceId);
-        return Ok(projects);
+        return Ok(ApiResponse<List<ProjectDto>>.Ok(projects));
     }
 
+    [Authorize(Policy = "CanCreateProjects")]
     [HttpPost]
     public async Task<IActionResult> CreateProject( [FromBody] CreateProjectRequestDto request)
     {
@@ -28,9 +31,9 @@ public class ProjectsController( IProjectService _projectService) : ControllerBa
         string role = GetRole();
 
         ProjectDto project = await _projectService.CreateAsync(workspaceId, userId, role,  request);
-
-        return Ok(project);
+        return Ok(ApiResponse<ProjectDto>.Ok(project));
     }
+
 
     private Guid GetWorkspaceId()
     {

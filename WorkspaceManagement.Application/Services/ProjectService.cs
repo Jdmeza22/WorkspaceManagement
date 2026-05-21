@@ -14,12 +14,6 @@ public class ProjectService(IProjectRepository _projectRepository) : IProjectSer
 
     public async Task<ProjectDto> CreateAsync(  Guid workspaceId, Guid createdBy,string role,  CreateProjectRequestDto request)
     {
-        if (role != "Admin" && role != "Editor")
-        {
-            throw new UnauthorizedAccessException(
-                "You do not have permissions to create projects");
-        }
-
         return await _projectRepository.CreateAsync( workspaceId, createdBy,request);
     }
 }

@@ -1,8 +1,13 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using WorkspaceManagement.Api.Middlewares;
 using WorkspaceManagement.Application.Interfaces;
 using WorkspaceManagement.Application.Services;
+using WorkspaceManagement.Application.Validators.Auth;
+using WorkspaceManagement.Application.Validators.Projects;
 using WorkspaceManagement.Infrastructure.Authentication;
 using WorkspaceManagement.Infrastructure.Persistance;
 using WorkspaceManagement.Infrastructure.Repositories;
@@ -56,6 +61,12 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddScoped<SqlConnectionFactory>();
 
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateProjectValidator>();
+
+
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -83,14 +94,27 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CanCreateProjects",
+        policy =>
+        {
+            policy.RequireRole("Admin", "Editor");
+        });
+
+    options.AddPolicy("AdminOnly",
+        policy =>
+        {
+            policy.RequireRole("Admin");
+        });
+});
 
 var app = builder.Build();
 
 app.UseSwagger();
 
 app.UseSwaggerUI();
-
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 
 app.UseAuthorization();

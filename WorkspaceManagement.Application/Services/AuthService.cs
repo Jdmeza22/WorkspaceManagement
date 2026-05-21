@@ -13,11 +13,11 @@ public class AuthService( IAuthRepository _authRepository, IJwtService _jwtServi
     {
         User user = await _authRepository.GetUserByEmailAsync(request.Email);
 
-        if (user is null){ throw new Exception("Invalid credentials"); }
-        string hash = BCrypt.Net.BCrypt.HashPassword("Clave.123*");
+        if (user is null){ throw new UnauthorizedAccessException( "Invalid credentials"); }
+
         bool isValidPassword = BCrypt.Net.BCrypt.Verify(  request.Password, user.Password);
 
-        if (!isValidPassword){ throw new Exception("Invalid credentials");}
+        if (!isValidPassword){ throw new UnauthorizedAccessException("Invalid credentials"); ; }
 
         List<WorkspaceDto> workspaces = await _authRepository.GetUserWorkspacesAsync(user.Id);
 
@@ -34,7 +34,7 @@ public class AuthService( IAuthRepository _authRepository, IJwtService _jwtServi
     {
         WorkspaceDto access = await _authRepository.GetWorkspaceAccessAsync(request.UserId,request.WorkspaceId);
 
-        if (access is null){ throw new Exception("Workspace access denied");}
+        if (access is null){ throw new UnauthorizedAccessException("Workspace access denied");}
 
         string token = _jwtService.GenerateToken( request.UserId,request.WorkspaceId,access.Role);
 

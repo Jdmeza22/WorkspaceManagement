@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Microsoft.AspNetCore.Mvc;
+using WorkspaceManagement.Application.Common.Responses;
 using WorkspaceManagement.Application.Dtos.Auth;
 using WorkspaceManagement.Application.Interfaces;
 
@@ -13,28 +14,14 @@ public class AuthController(IAuthService _authService) : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
-        try
-        {
-            LoginResponseDto response = await _authService.LoginAsync(request);
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
+        LoginResponseDto response = await _authService.LoginAsync(request);
+        return Ok(ApiResponse<LoginResponseDto>.Ok(response));
     }
 
     [HttpPost("token")]
     public async Task<IActionResult> GenerateToken( [FromBody] GenerateTokenRequestDto request)
     {
-        try
-        {
-            GenerateTokenResponseDto response = await _authService.GenerateTokenAsync(request);
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
+        GenerateTokenResponseDto response = await _authService.GenerateTokenAsync(request);
+        return Ok(ApiResponse<GenerateTokenResponseDto>.Ok(response));   
     }
 }
