@@ -129,7 +129,7 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseHttpsRedirection();
+    //app.UseHttpsRedirection();
 }
 
 app.UseCors("AllowAngular");

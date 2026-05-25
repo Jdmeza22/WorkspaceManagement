@@ -1,0 +1,21 @@
+services:
+  workspacemanagement.api:
+    image: ${DOCKER_REGISTRY-}workspacemanagementapi
+    build:
+      context: .
+      dockerfile: WorkspaceManagement.Api/Dockerfile
+    ports:
+      - 5000:8080
+      - 5001:8081
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: workspace-sql
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=SEC_PASS2026*
+    volumes:
+      - ./.containers/db:/var/lib/sqlServer/data 
+    ports:
+      - "1433:1433"
