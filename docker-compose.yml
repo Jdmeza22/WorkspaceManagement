@@ -10,11 +10,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
   database:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    build:
+      context: ./Database
+      dockerfile: Dockerfile
     container_name: workspace-sql
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=SEC_PASS2026*
+      - SA_PASSWORD=SecPass2026*
     volumes:
       - ./.containers/db:/var/lib/sqlServer/data 
     ports:

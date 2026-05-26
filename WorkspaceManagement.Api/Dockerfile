@@ -8,6 +8,7 @@ COPY ["WorkspaceManagement.Domain/WorkspaceManagement.Domain.csproj", "Workspace
 COPY ["WorkspaceManagement.Infrastructure/WorkspaceManagement.Infrastructure.csproj", "WorkspaceManagement.Infrastructure/"]
 
 
+
 RUN dotnet restore "WorkspaceManagement.Api/WorkspaceManagement.Api.csproj"
 COPY . .
 WORKDIR "/src/WorkspaceManagement.Api"
