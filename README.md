@@ -25,7 +25,3 @@ Inicio completo de la aplicación
 
 🔐 Credenciale
 La aplicación incluye datos precargados para pruebas funcionales.
-
-Usuario Administrador
-Correo: admin@elogic.com
-Contraseña: Clave.123*
